@@ -1,16 +1,172 @@
-# React + Vite
+# AUREA — ювелирный интернет-магазин
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Лендинг ювелирного бренда **AUREA**: главная страница магазина с витриной украшений, категориями, бестселлерами, отзывами, подарочными картами и подпиской на рассылку.
 
-Currently, two official plugins are available:
+Проект собран на **React + Vite**, а код организован по методологии **[Feature-Sliced Design](https://feature-sliced.design/ru/)** (FSD).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Стек
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Что | Чем |
+| --- | --- |
+| UI | React 19 |
+| Сборка и dev-сервер | Vite |
+| Линтинг | ESLint |
 
-## Expanding the ESLint configuration
+## Быстрый старт
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Нужен Node.js 20+.
+
+```bash
+npm install      # установить зависимости
+npm run dev      # запустить dev-сервер (http://localhost:5173)
+npm run build    # собрать production-версию в dist/
+npm run preview  # посмотреть собранную версию локально
+npm run lint     # проверить код линтером
+```
+
+---
+
+## Что на странице
+
+Главная страница состоит из секций, которые идут сверху вниз в таком порядке. Каждая секция — отдельный виджет в `src/widgets/`.
+
+| № | Секция | Папка | Что показывает |
+| --- | --- | --- | --- |
+| 1 | Шапка | `header` | Логотип, навигация, иконки поиска / избранного / корзины |
+| 2 | Первый экран | `hero` | Главный баннер с заголовком и призывом к действию |
+| 3 | Категории | `categories` | Кольца, серьги, колье и другие разделы каталога |
+| 4 | Мастерство | `craftsmanship` | Рассказ о ручной работе и материалах |
+| 5 | Бестселлеры | `bestsellers` | Сетка карточек самых популярных товаров |
+| 6 | Промо коллекции | `collection-promo` | Баннер новой или сезонной коллекции |
+| 7 | Преимущества | `benefits` | Доставка, гарантия, возврат и т. п. |
+| 8 | Отзывы | `testimonials` | Отзывы покупателей |
+| 9 | Подарочные карты | `gift-cards` | Предложение купить подарочный сертификат |
+| 10 | Рассылка | `newsletter` | Форма подписки на новости |
+| 11 | Подвал | `footer` | Контакты, ссылки, соцсети |
+
+---
+
+## Архитектура
+
+Код разделён на **слои**. Чем ниже слой в списке, тем он проще и универсальнее.
+
+```
+src/
+├── app/                 → точка входа приложения
+│   ├── styles/          → глобальные стили, подключение шрифтов
+│   └── App.jsx
+├── pages/
+│   └── home/            → только собирает виджеты по порядку
+├── widgets/             → крупные секции страницы
+│   ├── header/
+│   ├── hero/
+│   ├── categories/
+│   ├── craftsmanship/
+│   ├── bestsellers/
+│   ├── collection-promo/
+│   ├── benefits/
+│   ├── testimonials/
+│   ├── gift-cards/
+│   ├── newsletter/
+│   └── footer/
+├── features/            → действия пользователя
+│   ├── toggle-favorite/     → сердечко «в избранное» на карточке
+│   └── subscribe-newsletter/ → форма подписки
+├── entities/            → бизнес-сущности
+│   ├── product/         → ProductCard, тип Product, моковые данные
+│   └── category/        → карточка категории, моковые данные
+└── shared/              → переиспользуемое, без бизнес-логики
+    ├── ui/              → Button, Badge, Input, Checkbox, Container, IconButton…
+    ├── assets/          → картинки, иконки
+    └── lib/             → cn() и прочие утилиты
+```
+
+### Что за что отвечает
+
+- **`app`** — запуск приложения, глобальные стили, шрифты, провайдеры. Здесь нет вёрстки конкретных блоков.
+- **`pages`** — страницы. Страница ничего не верстает сама, а просто расставляет виджеты по порядку:
+
+  ```jsx
+  export function HomePage() {
+    return (
+      <>
+        <Header />
+        <Hero />
+        <Categories />
+        {/* ... */}
+        <Footer />
+      </>
+    )
+  }
+  ```
+
+- **`widgets`** — самостоятельные секции страницы. Виджет собирается из фич, сущностей и shared-компонентов.
+- **`features`** — то, что пользователь *делает*: добавляет в избранное, подписывается на рассылку. Здесь живут состояние и обработчики.
+- **`entities`** — то, с чем работает магазин: товар, категория. Здесь лежат их карточки, описание данных и моки.
+- **`shared`** — «кирпичики» без привязки к ювелирке: кнопки, инпуты, контейнер, иконки, утилиты. Их можно перенести в любой другой проект.
+
+### Правила импортов
+
+1. **Импортировать можно только из слоёв ниже.**
+   `app → pages → widgets → features → entities → shared`
+
+   ✅ виджет `bestsellers` использует `ProductCard` из `entities/product`
+   ❌ `entities/product` импортирует что-то из `widgets`
+
+2. **Слайсы одного слоя не знают друг о друге.**
+   ❌ `widgets/hero` импортирует из `widgets/header`
+   Если что-то нужно двоим — опустите это на слой ниже (обычно в `shared`).
+
+3. **Импорт только через публичный API.** У каждого слайса есть `index.js`, который экспортирует наружу то, что можно использовать:
+
+   ```js
+   // src/entities/product/index.js
+   export { ProductCard } from './ui/ProductCard'
+   export { products } from './model/mocks'
+   ```
+
+   ```js
+   // ✅ так
+   import { ProductCard } from '@/entities/product'
+   // ❌ не так
+   import { ProductCard } from '@/entities/product/ui/ProductCard'
+   ```
+
+### Как устроен слайс внутри
+
+Слайс (например, `entities/product` или `widgets/hero`) делится на сегменты по назначению:
+
+```
+product/
+├── ui/        → React-компоненты
+├── model/     → данные, моки, состояние
+├── lib/       → вспомогательные функции слайса
+└── index.js   → публичный API
+```
+
+Создавайте только те сегменты, которые реально нужны.
+
+---
+
+## Как добавить новое
+
+| Задача | Куда |
+| --- | --- |
+| Новая секция на главной | `src/widgets/<name>/` + подключить в `pages/home` |
+| Новое действие пользователя (например, «добавить в корзину») | `src/features/<name>/` |
+| Новая сущность (например, отзыв, коллекция) | `src/entities/<name>/` |
+| Новая универсальная кнопка, иконка, утилита | `src/shared/...` |
+| Шрифты и глобальные стили | `src/app/styles/` |
+
+## Соглашения
+
+- Папки — в `kebab-case`: `gift-cards`, `toggle-favorite`.
+- Компоненты — в `PascalCase`: `ProductCard.jsx`, `IconButton.jsx`.
+- Классы объединяются через утилиту `cn()` из `shared/lib`.
+- Данные товаров и категорий пока моковые и лежат в `entities/*/model`.
+
+## Статус
+
+🚧 Проект в разработке: структура слоёв создана, секции главной страницы верстаются по макету **[FIGMA](https://www.figma.com/design/JV5ri7OrG2rdxnTSB0NLsW/Untitled?node-id=0-1&t=DOjB4GqwwTcfhXDA-1)**.
