@@ -1,0 +1,83 @@
+@import '@fontsource/cormorant-garamond/400.css';
+@import '@fontsource/cormorant-garamond/500.css';
+@import '@fontsource-variable/inter/index.css';
+
+@import 'tailwindcss';
+
+/* Дизайн-токены из макета */
+@theme {
+    --color-canvas: #faf8f4;
+    /* основной фон страницы */
+    --color-surface: #f5f0e8;
+    /* бежевый секции: hero, мастерская, отзывы */
+    --color-ink: #1f1a17;
+    /* основной текс, темный кнопки */
+    --color-ink-muted: #6b625b;
+    /* описания */
+    --color-ink-subtle: #9a9089;
+    /* "48 ИЗДЕЛИЙ", "Золото 750" */
+    --color-gold: #a67c52;
+    /* золото подписи и линии */
+    --color-gold-light: #d4b98c;
+    /* золотой на темном фоне */
+    --color-line: #e4dcd1;
+    /* разделители */
+    --color-espresso: #3a2925;
+    /* промо коллекции */
+    --color-night: #211c19;
+    /* футер */
+    --color-on-dark: #f5f0e8;
+    /* текст на темном */
+    --color-on-dark-muted: #a89f97;
+
+    /* ----- Шрифты ----- */
+    --font-serif: 'Cormorant Garamond',
+        Georgia,
+        serif;
+    --font-sans: 'Inter Variable',
+        ui-sans-serif,
+        system-ui,
+        sans-serif;
+
+    /* ----- Типографика (размер + межстрочный интервал) ----- */
+    --text-display: clamp(3rem, 2rem + 4vw, 5rem);
+    /* 80px — hero */
+    --text-display--line-height: 1.05;
+    --text-h2: clamp(2.25rem, 1.75rem + 2vw, 3rem);
+    /* 48px — заголовки секций */
+    --text-h2--line-height: 1.1;
+    --text-h3: 1.625rem;
+    /* 26px — «Кольца», названия товаров */
+    --text-h3--line-height: 1.2;
+    --text-quote: clamp(1.5rem, 1.2rem + 1vw, 2.125rem);
+    /* 34px — цитата отзыва */
+    --text-quote--line-height: 1.35;
+    --text-body: 0.9375rem;
+    /* 15px */
+    --text-body--line-height: 1.65;
+    --text-small: 0.8125rem;
+    /* 13px */
+    --text-small--line-height: 1.5;
+    --text-caption: 0.6875rem;
+    /* 11px — капс-подписи */
+    --text-caption--line-height: 1.4;
+    /* ---------- Прочее ---------- */
+    --radius-card: 6px;
+}
+
+/* Базовые стили тегов */
+@layer base {
+    body {
+        @apply bg-canvas font-sans text-body text-ink antialiased;
+    }
+
+    h1,
+    h2,
+    h3 {
+        @apply font-serif font-normal;
+    }
+
+    :focus-visible {
+        @apply outline-2 outline-offset-3 outline-gold;
+    }
+}

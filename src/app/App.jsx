@@ -1,9 +1,6 @@
-function App() {
-  return (
-    <>
-      <h1>New Project</h1>
-    </>
-  )
-}
+import { HomePage } from '@/pages/home'
+import './styles/index.css'
 
-export default App
+export function App() {
+  return <HomePage />
+}
